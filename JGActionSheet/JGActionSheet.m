@@ -8,7 +8,6 @@
 
 #import "JGActionSheet.h"
 #import <QuartzCore/QuartzCore.h>
-
 #if !__has_feature(objc_arc)
 #error "JGActionSheet requires ARC!"
 #endif
@@ -47,15 +46,15 @@
 #define iPad (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
 #endif
 
-#define kHostsCornerRadius 3.0f
+#define kHostsCornerRadius 1.0f
 
 #define kSpacing 5.0f
 
 #define kArrowBaseWidth 20.0f
 #define kArrowHeight 10.0f
 
-#define kShadowRadius 4.0f
-#define kShadowOpacity 0.2f
+#define kShadowRadius 0.0f
+#define kShadowOpacity 0.0f
 
 #define kFixedWidth 320.0f
 #define kFixedWidthContinuous 300.0f
@@ -201,11 +200,17 @@ static BOOL disableCustomEasing = NO;
 #pragma mark Initializers
 
 + (instancetype)cancelSection {
-    return [self sectionWithTitle:nil message:nil buttonTitles:@[NSLocalizedString(@"Cancel",)] buttonStyle:JGActionSheetButtonStyleCancel];
+    return [self sectionWithTitle:nil message:nil buttonTitles:@[NSLocalizedString(@"cancel",)] buttonStyle:JGActionSheetButtonStyleCancel];
 }
 
 + (instancetype)sectionWithTitle:(NSString *)title message:(NSString *)message buttonTitles:(NSArray *)buttonTitles buttonStyle:(JGActionSheetButtonStyle)buttonStyle {
     return [[self alloc] initWithTitle:title message:message buttonTitles:buttonTitles buttonStyle:buttonStyle];
+}
+
+- (instancetype)initWithTitle:(NSString *)title message:(NSString *)message buttonTitles:(NSArray *)buttonTitles buttonColors:(NSArray *)colors buttonStyle:(JGActionSheetButtonStyle)buttonStyle
+{
+    _colors = colors;
+    return [self initWithTitle:title message:message buttonTitles:buttonTitles buttonStyle:buttonStyle];
 }
 
 - (instancetype)initWithTitle:(NSString *)title message:(NSString *)message buttonTitles:(NSArray *)buttonTitles buttonStyle:(JGActionSheetButtonStyle)buttonStyle {
@@ -217,7 +222,7 @@ static BOOL disableCustomEasing = NO;
             titleLabel.backgroundColor = [UIColor clearColor];
             titleLabel.textAlignment = NSTextAlignmentCenter;
             titleLabel.font = [UIFont boldSystemFontOfSize:14.0f];
-            titleLabel.textColor = [UIColor blackColor];
+            titleLabel.textColor = [UIColor lightGrayColor];//[UIColor blackColor];
             titleLabel.numberOfLines = 1;
             
             titleLabel.text = title;
@@ -250,7 +255,10 @@ static BOOL disableCustomEasing = NO;
             for (NSString *str in buttonTitles) {
                 JGButton *b = [self makeButtonWithTitle:str style:buttonStyle];
                 b.row = (NSUInteger)index;
-                
+                if (index < _colors.count) {
+                    UIColor *color = _colors[index];
+                    [b setTitleColor:color forState:UIControlStateNormal];
+                }
                 [self addSubview:b];
                 
                 [buttons addObject:b];
@@ -320,7 +328,7 @@ static BOOL disableCustomEasing = NO;
         self.layer.shadowOpacity = 0.0f;
     }
     else {
-        self.backgroundColor = [UIColor whiteColor];
+        self.backgroundColor = [UIColor colorWithWhite:1 alpha:.9];
         self.layer.cornerRadius = kHostsCornerRadius;
         
         self.layer.shadowColor = [UIColor blackColor].CGColor;
@@ -368,8 +376,8 @@ static BOOL disableCustomEasing = NO;
         borderColor = [UIColor colorWithWhite:0.9f alpha:1.0f];
     }
     else if (buttonStyle == JGActionSheetButtonStyleCancel) {
-        font = [UIFont boldSystemFontOfSize:15.0f];
-        titleColor = [UIColor blackColor];
+        font = [UIFont systemFontOfSize:15.0f];
+        titleColor = [UIColor colorWithRed:118.0/255.0 green:118.0/255.0 blue:118.0/255.0 alpha:1];
         
         backgroundColor = [UIColor colorWithWhite:0.95f alpha:1.0f];
         borderColor = [UIColor colorWithWhite:0.9f alpha:1.0f];
@@ -400,19 +408,19 @@ static BOOL disableCustomEasing = NO;
     
     button.titleLabel.font = font;
     
-    [button setBackgroundImage:[self pixelImageWithColor:backgroundColor] forState:UIControlStateNormal];
-    [button setBackgroundImage:[self pixelImageWithColor:borderColor] forState:UIControlStateHighlighted];
-    
-    button.layer.borderColor = borderColor.CGColor;
+//    [button setBackgroundImage:[self pixelImageWithColor:backgroundColor] forState:UIControlStateNormal];
+//    [button setBackgroundImage:[self pixelImageWithColor:borderColor] forState:UIControlStateHighlighted];
+//    
+//    button.layer.borderColor = borderColor.CGColor;
 }
 
 - (JGButton *)makeButtonWithTitle:(NSString *)title style:(JGActionSheetButtonStyle)style {
     JGButton *b = [[JGButton alloc] init];
     
-    b.layer.cornerRadius = 2.0f;
-    b.layer.masksToBounds = YES;
-    b.layer.borderWidth = 1.0f;
-    
+//    b.layer.cornerRadius = 2.0f;
+//    b.layer.masksToBounds = YES;
+//    b.layer.borderWidth = 1.0f;
+
     [b setTitle:title forState:UIControlStateNormal];
     
     [b addTarget:self action:@selector(buttonPressed:) forControlEvents:UIControlEventTouchUpInside];
@@ -431,16 +439,21 @@ static BOOL disableCustomEasing = NO;
 - (CGRect)layoutForWidth:(CGFloat)width {
     CGFloat buttonHeight = 40.0f;
     CGFloat spacing = kSpacing;
-    
+    UIColor *lineColor = [UIColor colorWithRed:232.0/255.0 green:232.0/255.0 blue:232.0/255.0 alpha:1];
+    CGFloat lineHeight = 1/[UIScreen mainScreen].scale;
     CGFloat height = 0.0f;
     
     if (self.titleLabel) {
         height += spacing;
         
         [self.titleLabel sizeToFit];
-        height += CGRectGetHeight(self.titleLabel.frame);
+        height += CGRectGetHeight(self.titleLabel.frame)+spacing*2;
         
-        self.titleLabel.frame = (CGRect){{spacing, spacing}, {width-spacing*2.0f, CGRectGetHeight(self.titleLabel.frame)}};
+        self.titleLabel.frame = (CGRect){{spacing, spacing*2}, {width-spacing*2.0f, CGRectGetHeight(self.titleLabel.frame)}};
+
+//        UIView *line = [[UIView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(self.titleLabel.frame)+spacing*2, width, lineHeight)];
+//        line.backgroundColor = lineColor;
+//        [self addSubview:line];
     }
     
     if (self.messageLabel) {
@@ -473,6 +486,12 @@ static BOOL disableCustomEasing = NO;
         button.frame = (CGRect){{spacing, height}, {width-spacing*2.0f, buttonHeight}};
         
         height += buttonHeight;
+        if (![button isEqual:[self.buttons lastObject]]) {
+            UIView *line = [[UIView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(button.frame)+spacing, width, lineHeight)];
+            line.backgroundColor = lineColor;
+            [self addSubview:line];
+        }
+
     }
     
     if (self.contentView) {
@@ -637,10 +656,10 @@ static BOOL disableCustomEasing = NO;
     CGFloat width = CGRectGetWidth(frame);
     
     if (!continuous) {
-        width -= 2.0f*spacing;
+        width -= 4.0f*spacing;
     }
     
-    CGFloat height = (continuous ? 0.0f : spacing);
+    CGFloat height = (continuous ? 0.0f : 3*kSpacing);
     
     for (JGActionSheetSection *section in self.sections) {
         if (initial) {
@@ -652,7 +671,7 @@ static BOOL disableCustomEasing = NO;
         f.origin.y = height;
         
         if (!continuous) {
-            f.origin.x = spacing;
+            f.origin.x = 2*spacing;
         }
         
         section.frame = f;
@@ -665,7 +684,7 @@ static BOOL disableCustomEasing = NO;
     }
     
     _scrollView.contentSize = (CGSize){CGRectGetWidth(frame), height};
-    
+    _scrollView.backgroundColor = [UIColor colorWithRed:228.0/255.0 green:228.0/255.0 blue:228.0/255.0 alpha:1];
     if (!fitToRect && !continuous) {
         frame.size.height = CGRectGetHeight(_targetView.bounds)-CGRectGetMinY(frame);
     }
@@ -1034,6 +1053,24 @@ static BOOL disableCustomEasing = NO;
 
 - (BOOL)isVisible {
     return (_targetView != nil);
+}
+
++ (JGActionSheet*)actionSheetWithTitles:(NSArray*)titles colors:(NSArray*)colors {
+    JGActionSheetSection *section1 = [[JGActionSheetSection alloc] initWithTitle:nil message:nil buttonTitles:titles buttonColors:colors buttonStyle:JGActionSheetButtonStyleDefault];
+
+    JGActionSheetSection *cancelSection = [JGActionSheetSection sectionWithTitle:nil message:nil buttonTitles:@[@"取消"] buttonStyle:JGActionSheetButtonStyleCancel];
+
+    NSArray *sections = @[section1, cancelSection];
+
+    JGActionSheet *sheet = [JGActionSheet actionSheetWithSections:sections];
+
+    [sheet setButtonPressedBlock:^(JGActionSheet *sheet, NSIndexPath *indexPath) {
+        [sheet dismissAnimated:YES];
+        NSLog(@"ind %ld, %ld", indexPath.row, indexPath.section);
+    }];
+    UIView *windowView = [[UIApplication sharedApplication].windows lastObject];
+    [sheet showInView:windowView animated:YES];
+    return sheet;
 }
 
 @end
