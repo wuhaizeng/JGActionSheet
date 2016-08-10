@@ -187,7 +187,14 @@
         [self multipleSections:nil];
     }
     else {
-        [self multipleAndContentView:nil];
+//        [self multipleAndContentView:nil];
+        NSArray *colors = @[[UIColor redColor], [UIColor blueColor], [UIColor orangeColor],[UIColor orangeColor]];
+        NSArray *titles = @[@"red",@"blue",@"origin",@"34"];
+        JGActionSheet *sheet = [JGActionSheet actionSheetWithTitles:titles colors:colors];
+        [sheet setButtonPressedBlock:^(JGActionSheet *sheet, NSIndexPath *indexPath) {
+            [sheet dismissAnimated:YES];
+            NSLog(@"ind %ld, %ld", indexPath.row, indexPath.section);
+        }];
     }
 }
 
