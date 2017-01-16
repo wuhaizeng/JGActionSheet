@@ -213,6 +213,12 @@ static BOOL disableCustomEasing = NO;
     return [self initWithTitle:title message:message buttonTitles:buttonTitles buttonStyle:buttonStyle];
 }
 
+- (instancetype)initWithTitle:(NSString *)title message:(NSString *)message buttonTitles:(NSArray *)buttonTitles buttonColors:(NSArray *)colors imageNames:(NSArray*)imageNames buttonStyle:(JGActionSheetButtonStyle)buttonStyle {
+    _colors = colors;
+    _imageNames = imageNames;
+    return [self initWithTitle:title message:message buttonTitles:buttonTitles buttonStyle:buttonStyle];
+}
+
 - (instancetype)initWithTitle:(NSString *)title message:(NSString *)message buttonTitles:(NSArray *)buttonTitles buttonStyle:(JGActionSheetButtonStyle)buttonStyle {
     self = [super init];
     
@@ -258,6 +264,11 @@ static BOOL disableCustomEasing = NO;
                 if (index < _colors.count) {
                     UIColor *color = _colors[index];
                     [b setTitleColor:color forState:UIControlStateNormal];
+                }
+                if (index < _imageNames.count) {
+                    NSString *imageName = _imageNames[index];
+                    UIImage *titleImage = [UIImage imageNamed:imageName];
+                    [b setImage:titleImage forState:UIControlStateNormal];
                 }
                 [self addSubview:b];
                 

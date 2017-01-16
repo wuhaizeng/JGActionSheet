@@ -60,6 +60,7 @@ typedef NS_ENUM(NSUInteger, JGActionSheetArrowDirection) {
 @property (nonatomic, strong, readonly) NSArray *buttons;
 
 @property (nonatomic, strong, readonly) NSArray *colors;
+@property (nonatomic, strong, readonly) NSArray *imageNames;
 /**
  If the section was initialized with a custom contentView it is available from this property.
  @Note The content view will be resized to match the width of the action sheet. This is minimally 290 points. The height of the content view will not be changed.
@@ -87,6 +88,8 @@ typedef NS_ENUM(NSUInteger, JGActionSheetArrowDirection) {
 - (instancetype)initWithTitle:(NSString *)title message:(NSString *)message buttonTitles:(NSArray *)buttonTitles buttonStyle:(JGActionSheetButtonStyle)buttonStyle;
 
 - (instancetype)initWithTitle:(NSString *)title message:(NSString *)message buttonTitles:(NSArray *)buttonTitles buttonColors:(NSArray *)colors buttonStyle:(JGActionSheetButtonStyle)buttonStyle;
+
+- (instancetype)initWithTitle:(NSString *)title message:(NSString *)message buttonTitles:(NSArray *)buttonTitles buttonColors:(NSArray *)colors imageNames:(NSArray*)imageNames buttonStyle:(JGActionSheetButtonStyle)buttonStyle;
 
 /**
  Convenience initializer for the @c initWithTitle:message:contentView: method.

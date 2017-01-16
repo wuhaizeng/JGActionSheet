@@ -189,12 +189,22 @@
     else {
 //        [self multipleAndContentView:nil];
         NSArray *colors = @[[UIColor redColor], [UIColor blueColor], [UIColor orangeColor],[UIColor orangeColor]];
-        NSArray *titles = @[@"red",@"blue",@"origin",@"34"];
-        JGActionSheet *sheet = [JGActionSheet actionSheetWithTitles:titles colors:colors];
+        NSArray *titles = @[@"1888888888",@"688888"];
+        NSArray *imageNames = @[@"网盘",@"邮箱"];
+
+        JGActionSheetSection *section1 = [[JGActionSheetSection alloc] initWithTitle:nil message:nil buttonTitles:titles buttonColors:colors imageNames:imageNames buttonStyle:JGActionSheetButtonStyleDefault];
+
+        JGActionSheetSection *cancelSection = [JGActionSheetSection sectionWithTitle:nil message:nil buttonTitles:@[@"取消"] buttonStyle:JGActionSheetButtonStyleCancel];
+
+        NSArray *sections = @[section1, cancelSection];
+
+        JGActionSheet *sheet = [JGActionSheet actionSheetWithSections:sections];
+
         [sheet setButtonPressedBlock:^(JGActionSheet *sheet, NSIndexPath *indexPath) {
             [sheet dismissAnimated:YES];
             NSLog(@"ind %ld, %ld", indexPath.row, indexPath.section);
         }];
+        [sheet showInView:self.navigationController.view animated:YES];
     }
 }
 
